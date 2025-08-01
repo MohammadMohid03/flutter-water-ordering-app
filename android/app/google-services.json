@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "704625631684",
+    "project_id": "spinza-5a6b8",
+    "storage_bucket": "spinza-5a6b8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704625631684:android:e5b49cd28239a78cc90491",
+        "android_client_info": {
+          "package_name": "com.Spinza"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoKwuf_Bn4JU90a-OLzZ9CMp39qOJi8aA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704625631684:android:99590a4ef3a47a58c90491",
+        "android_client_info": {
+          "package_name": "com.example.spinza"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoKwuf_Bn4JU90a-OLzZ9CMp39qOJi8aA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
