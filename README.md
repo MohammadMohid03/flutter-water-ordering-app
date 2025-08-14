@@ -33,7 +33,7 @@ A Flutter-based mobile app for ordering mineral water bottles with a clean, mode
 ## 📦 APK
 
 You can download the latest APKs here:  
-- ** App:** [Download Client APK](https://github.com/YourUsername/flutter-water-ordering-app/releases/latest)  
+- ** App:** [Download Client APK](https://github.com/MohammadMohid03/flutter-water-ordering-app/releases/latest)  
 
 > ⚠ Note: For local development, you need to configure your own Firebase project and add `firebase_options.dart`.
 
@@ -43,4 +43,4 @@ You can download the latest APKs here:
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/YourUsername/flutter-water-ordering-app.git
+   git clone https://github.com/MohammadMohid03/flutter-water-ordering-app.git
