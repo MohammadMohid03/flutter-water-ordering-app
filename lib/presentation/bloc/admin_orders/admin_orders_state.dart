@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
+// The helper class for the summary is correct and stays here.
 class ClientOrderSummary extends Equatable {
   final String clientId;
   final String clientName;
@@ -18,11 +19,15 @@ class ClientOrderSummary extends Equatable {
     required this.totalSpent,
     required this.lastOrderDate,
     required this.orders,
+
   });
 
   @override
   List<Object?> get props => [clientId, totalOrders, totalSpent];
 }
+
+// --- THIS SECTION IS NOW CORRECT ---
+// It only contains the State classes.
 
 abstract class AdminOrdersState extends Equatable {
   const AdminOrdersState();

@@ -24,7 +24,34 @@ class FullScreenImageScreen extends StatelessWidget {
           panEnabled: true,
           minScale: 0.5,
           maxScale: 4,
-          child: Image.asset(imageAssetPath),
+          // --- THIS IS THE CORRECTED PART ---
+          child: imageAssetPath.startsWith('http')
+          // If it's a URL from Firebase, use Image.network
+              ? Image.network(
+            imageAssetPath,
+            // Add a loading builder for a better user experience
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              );
+            },
+            // Add an error builder in case the network image fails
+            errorBuilder: (context, error, stackTrace) =>
+            const Center(child: Icon(Icons.broken_image_outlined, color: Colors.white, size: 48)),
+          )
+          // Otherwise, assume it's a local asset and use Image.asset
+              : Image.asset(
+            imageAssetPath,
+            errorBuilder: (context, error, stackTrace) =>
+            const Center(child: Icon(Icons.broken_image_outlined, color: Colors.white, size: 48)),
+          ),
         ),
       ),
     );

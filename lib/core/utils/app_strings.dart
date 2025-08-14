@@ -9,4 +9,7 @@ class AppStrings {
   static const String quantity = 'Quantity';
   static const String total = 'Total';
   static const String anErrorOccurred = 'An error occurred. Please try again.';
+  static const String addToCart = 'Add to Cart';
+  static const String cart = 'Cart';
+
 }

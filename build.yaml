@@ -1,0 +1,12 @@
+targets:
+  $default:
+    builders:
+      flutter_gen|flutter_generator:
+        enabled: true
+      # This is the important part for animations
+      # It configures the Flutter build process.
+      flutter_tools|build_system:
+        options:
+          # Tell the build system to not shake icons and to keep animation code.
+          gen_dart_plugin_registrant: true
+          tree_shake_icons: false

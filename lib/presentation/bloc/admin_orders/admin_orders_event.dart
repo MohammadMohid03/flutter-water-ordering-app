@@ -7,3 +7,13 @@ abstract class AdminOrdersEvent extends Equatable {
 }
 
 class FetchAllOrders extends AdminOrdersEvent {}
+
+class UpdateOrderStatus extends AdminOrdersEvent {
+  final String orderId;
+  final String newStatus;
+
+  const UpdateOrderStatus({required this.orderId, required this.newStatus});
+
+  @override
+  List<Object> get props => [orderId, newStatus];
+}

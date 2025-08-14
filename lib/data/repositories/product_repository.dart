@@ -1,11 +1,17 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:spinza/data/models/product_model.dart';
 
 class ProductRepository {
   final FirebaseFirestore _firestore;
+  final FirebaseStorage _firebaseStorage;
 
-  ProductRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+  ProductRepository({
+    FirebaseFirestore? firestore,
+    FirebaseStorage? firebaseStorage,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _firebaseStorage = firebaseStorage ?? FirebaseStorage.instance;
 
   Future<List<Product>> getProducts() async {
     try {
@@ -26,51 +32,65 @@ class ProductRepository {
     }
   }
 
-  // Adds a product using a string path for the image
+  // --- RE-INTRODUCE IMAGE UPLOAD LOGIC ---
+  Future<String> _uploadImage(File imageFile, String productId) async {
+    final ref = _firebaseStorage.ref().child('product_images').child('$productId.jpg');
+    await ref.putFile(imageFile);
+    return await ref.getDownloadURL();
+  }
+
+  // --- UPDATED addProduct METHOD ---
   Future<void> addProduct({
     required String name,
     required String description,
     required double price,
-    required String imageAssetPath,
+    required File imageFile, // Takes a File for new products
   }) async {
-    try {
-      await _firestore.collection('products').add({
-        'name': name,
-        'description': description,
-        'price': price,
-        'imageUrl': imageAssetPath, // Save the asset path directly
-      });
-    } catch (e) {
-      rethrow;
-    }
+    final newDocRef = _firestore.collection('products').doc();
+    final imageUrl = await _uploadImage(imageFile, newDocRef.id);
+    await newDocRef.set({
+      'name': name,
+      'description': description,
+      'price': price,
+      'imageUrl': imageUrl, // This will be an 'http' URL
+    });
   }
 
-  // Updates a product using a string path for the image
+  // --- UPDATED updateProduct METHOD ---
   Future<void> updateProduct({
     required String productId,
     required String name,
     required String description,
     required double price,
-    required String imageAssetPath,
+    File? imageFile, // Optional new image file
+    String? existingImageUrl, // The old URL (could be asset or network)
   }) async {
-    try {
-      await _firestore.collection('products').doc(productId).update({
-        'name': name,
-        'description': description,
-        'price': price,
-        'imageUrl': imageAssetPath, // Save the asset path directly
-      });
-    } catch (e) {
-      rethrow;
+    String imageUrl = existingImageUrl ?? '';
+
+    // If a new file is provided, upload it and get the new URL
+    if (imageFile != null) {
+      imageUrl = await _uploadImage(imageFile, productId);
     }
+
+    await _firestore.collection('products').doc(productId).update({
+      'name': name,
+      'description': description,
+      'price': price,
+      'imageUrl': imageUrl, // Save either the new URL or the old one
+    });
   }
 
-  // Deletes a product from Firestore (no storage interaction needed)
-  Future<void> deleteProduct(String productId) async {
-    try {
-      await _firestore.collection('products').doc(productId).delete();
-    } catch (e) {
-      rethrow;
+  // --- UPDATED deleteProduct METHOD ---
+  Future<void> deleteProduct(String productId, String imageUrl) async {
+    await _firestore.collection('products').doc(productId).delete();
+    // Only try to delete from Storage if it's a network image
+    if (imageUrl.startsWith('http')) {
+      final ref = _firebaseStorage.refFromURL(imageUrl);
+      try {
+        await ref.delete();
+      } catch (e) {
+        print("Info: Could not delete image $imageUrl. Error: $e");
+      }
     }
   }
 }

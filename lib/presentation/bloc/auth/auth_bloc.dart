@@ -5,13 +5,15 @@ import 'package:spinza/data/repositories/auth_repository.dart';
 import 'package:spinza/presentation/bloc/auth/auth_event.dart';
 import 'package:spinza/presentation/bloc/auth/auth_state.dart';
 import 'package:spinza/data/repositories/auth_failure.dart';
+import 'package:spinza/core/services/notification_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
+  final NotificationService _notificationService;
   late StreamSubscription<User?> _userSubscription;
 
-  AuthBloc({required AuthRepository authRepository})
-      : _authRepository = authRepository,
+  AuthBloc({required AuthRepository authRepository,required NotificationService notificationService,})
+      : _authRepository = authRepository,_notificationService = notificationService,
         super(const AuthState.unknown()) {
     // Listen to the user stream from the repository
     _userSubscription = _authRepository.user.listen(
@@ -28,12 +30,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (event.user != null) {
       final role = await _authRepository.getUserRole(event.user!.uid);
       if (role != null) {
+        if (role == 'admin') {
+          await _notificationService.subscribeToNewOrders();
+        }
         emit(AuthState.authenticated(user: event.user!, role: role));
       } else {
         emit(const AuthState.failure("Could not verify user role."));
         await _authRepository.logout();
       }
     } else {
+      await _notificationService.unsubscribeFromNewOrders();
       emit(const AuthState.unauthenticated());
     }
   }
@@ -67,8 +73,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _onLogoutRequested(
-      AuthLogoutRequested event, Emitter<AuthState> emit) {
+  Future<void> _onLogoutRequested(
+      AuthLogoutRequested event, Emitter<AuthState> emit) async {
+    await _notificationService.unsubscribeFromNewOrders();
     _authRepository.logout();
   }
 

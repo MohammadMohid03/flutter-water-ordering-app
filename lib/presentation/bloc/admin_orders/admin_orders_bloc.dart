@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spinza/data/repositories/admin_order_repository.dart';
 import 'package:spinza/presentation/bloc/admin_orders/admin_orders_event.dart';
 import 'package:spinza/presentation/bloc/admin_orders/admin_orders_state.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 
 class AdminOrdersBloc extends Bloc<AdminOrdersEvent, AdminOrdersState> {
   final AdminOrderRepository _adminOrderRepository;
@@ -11,6 +12,7 @@ class AdminOrdersBloc extends Bloc<AdminOrdersEvent, AdminOrdersState> {
       : _adminOrderRepository = adminOrderRepository,
         super(AdminOrdersInitial()) {
     on<FetchAllOrders>(_onFetchAllOrders);
+    on<UpdateOrderStatus>(_onUpdateOrderStatus,transformer: sequential()); // <-- REGISTER NEW HANDLER
   }
 
   Future<void> _onFetchAllOrders(FetchAllOrders event, Emitter<AdminOrdersState> emit) async {
@@ -54,6 +56,17 @@ class AdminOrdersBloc extends Bloc<AdminOrdersEvent, AdminOrdersState> {
       emit(AdminOrdersLoaded(summaries));
     } catch (e) {
       emit(AdminOrdersError(e.toString()));
+    }
+  }
+  // --- THIS HANDLER IS REVISED ---
+  Future<void> _onUpdateOrderStatus(UpdateOrderStatus event, Emitter<AdminOrdersState> emit) async {
+    try {
+      await _adminOrderRepository.updateOrderStatus(event.orderId, event.newStatus);
+      // After the update is complete, dispatch a new event to refresh the list.
+      // The sequential transformer ensures this runs after the update is fully processed.
+      add(FetchAllOrders());
+    } catch (e) {
+      emit(const AdminOrdersError("Failed to update status."));
     }
   }
 }

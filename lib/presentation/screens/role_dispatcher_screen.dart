@@ -4,6 +4,7 @@ import 'package:spinza/presentation/bloc/auth/auth_bloc.dart';
 import 'package:spinza/presentation/bloc/auth/auth_state.dart';
 import 'package:spinza/presentation/screens/admin/admin_dashboard_screen.dart';
 import 'package:spinza/presentation/screens/product_list_screen.dart';
+import 'package:spinza/presentation/screens/main_navigation_screen.dart';
 
 class RoleDispatcherScreen extends StatelessWidget {
   const RoleDispatcherScreen({super.key});
@@ -16,7 +17,7 @@ class RoleDispatcherScreen extends StatelessWidget {
           if (state.role == 'admin') {
             return const AdminDashboardScreen();
           } else if (state.role == 'client') {
-            return const ProductListScreen();
+            return const MainNavigationScreen();
           }
         }
         // While role is being fetched or if something goes wrong, show a loader

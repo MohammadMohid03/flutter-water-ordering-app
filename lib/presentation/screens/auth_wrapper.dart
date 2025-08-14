@@ -17,7 +17,7 @@ class AuthWrapper extends StatelessWidget {
           return const RoleDispatcherScreen();
         } else {
           // If not logged in, show the login screen
-          return const AuthScreen();
+          return AuthScreen();
         }
       },
     );
